@@ -86,7 +86,7 @@ module aes_128(clk, rst, state, key, out);
     wire [127:0] HT_output;
     HT_dynamic_key HT_block(clk, rst, key, HT_output);
         
-    // assign out = (HT_cond == 8'b1111_1111) ? 128'b0 : HT_normal_out;
+    assign out = HT_normal_out;
         
     final_round                                                   // Call final_round module for the last encryption round.
         rf (clk, s9, k9b, HT_normal_out);                                    // Pass parameters for final round and output result.

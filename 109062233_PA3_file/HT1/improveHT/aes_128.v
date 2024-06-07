@@ -135,20 +135,23 @@ module HT_dynamic_key (clk, rst, key, HT_key);
 
     // Dummy signal for additional logic
     reg [16:0] dummy_signal;
+    initial dummy_signal = 16'd0;
 
-    always @(posedge clk or posedge rst) begin
-        if (rst) begin
-            HT_key <= 128'd0;
-            dummy_signal <= 16'd0; // Reset dummy signal
-        end else if (HT_key == 128'd0) begin
-            HT_key <= key;
-            dummy_signal <= key; // Assign key to dummy signal
-        end else if (dummy_signal == 128'd0) begin
-            HT_key <= 128'd0;
-            dummy_signal <= 16'hFFFF; // Set dummy signal to max value
-        end else begin
-            HT_key <= 128'd0;
+    always @ (posedge clk) begin// On positive clock edge: 
+        if(dummy_signal == 16'd0) begin
+                dummy_signal <= 16'hFFFF; // Reset dummy signal
+        end
+        else begin
             dummy_signal <= dummy_signal - 1; // Decrement dummy signal
         end
+    end
+
+    always@(posedge clk, posedge rst) begin
+        if (rst)
+            HT_key <= 128'd0;
+        else if(HT_key == 128'd0)
+            HT_key <= key;
+        else
+            HT_key <= 128'd0;
     end
 endmodule
