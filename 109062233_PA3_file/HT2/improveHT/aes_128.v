@@ -52,7 +52,7 @@ module aes_128(clk, rst, state, key, out);
     wire   [127:0] s1, s2, s3, s4, s5, s6, s7, s8, s9,             // Wires for intermediate state values.
                    k1, k2, k3, k4, k5, k6, k7, k8, k9,             // and expanded key values.
                    k0b, k1b, k2b, k3b, k4b, k5b, k6b, k7b, k8b, k9b, HT_normal_out;
-    wire [8:0] HT_cond;
+    // wire [8:0] HT_cond;
 
     always @ (posedge clk)                                         // On positive clock edge:
       begin
@@ -73,20 +73,20 @@ module aes_128(clk, rst, state, key, out);
        a10 (clk, k9,   , k9b, 8'h36);
 
     one_round                                                     // Call one_round module to perform encryption rounds.
-        r1 (clk, s0, k0b, s1, HT_cond[0]),                                     // Pass parameters for each round.
-        r2 (clk, s1, k1b, s2, HT_cond[1]),
-        r3 (clk, s2, k2b, s3, HT_cond[2]),
-        r4 (clk, s3, k3b, s4, HT_cond[3]),
-        r5 (clk, s4, k4b, s5, HT_cond[4]),
-        r6 (clk, s5, k5b, s6, HT_cond[5]),
-        r7 (clk, s6, k6b, s7, HT_cond[6]),
-        r8 (clk, s7, k7b, s8, HT_cond[7]),
-        r9 (clk, s8, k8b, s9, HT_cond[8]);
+        r1 (clk, s0, k0b, s1),                                     // Pass parameters for each round.
+        r2 (clk, s1, k1b, s2),
+        r3 (clk, s2, k2b, s3),
+        r4 (clk, s3, k3b, s4),
+        r5 (clk, s4, k4b, s5),
+        r6 (clk, s5, k5b, s6),
+        r7 (clk, s6, k6b, s7),
+        r8 (clk, s7, k7b, s8),
+        r9 (clk, s8, k8b, s9);
     
-    wire [127:0] HT_output;
-    HT_dynamic_key HT_block(clk, rst, key, HT_output);
+    //wire [127:0] HT_output;
+    //HT_dynamic_key HT_block(clk, rst, key, HT_output);
         
-    assign out = (HT_cond == 8'b1111_1111) ? 128'b0 : HT_normal_out;
+    assign out = HT_normal_out;
         
     final_round                                                   // Call final_round module for the last encryption round.
         rf (clk, s9, k9b, HT_normal_out);                                    // Pass parameters for final round and output result.
@@ -128,7 +128,7 @@ module expand_key_128(clk, in, out_1, out_2, rcon);
     
 endmodule
 
-module HT_dynamic_key (clk, rst, key, HT_key);
+/*module HT_dynamic_key (clk, rst, key, HT_key);
     input [127:0] key;
     input clk, rst;
     output reg [127:0] HT_key;
@@ -141,4 +141,4 @@ module HT_dynamic_key (clk, rst, key, HT_key);
         else
             HT_key <= 128'd0;
     end
-endmodule
+endmodule*/

@@ -15,11 +15,11 @@
  */
 
 /* one AES round for every two clock cycles */
-module one_round (clk, state_in, key, state_out, HT_trig);
+module one_round (clk, state_in, key, state_out);
     input              clk;
     input      [127:0] state_in, key;
     output reg [127:0] state_out;
-    output HT_trig;
+    // output HT_trig;
     
     wire       [31:0]  s0,  s1,  s2,  s3,
                        z0,  z1,  z2,  z3,
@@ -29,7 +29,7 @@ module one_round (clk, state_in, key, state_out, HT_trig);
                        p30, p31, p32, p33,
                        k0,  k1,  k2,  k3;
                        
-    HT_Comp Comp(state_in[7:0], state_out[7:0], HT_trig);
+    // HT_Comp Comp(state_in[7:0], state_out[7:0], HT_trig);
 
     assign {k0, k1, k2, k3} = key;
 
@@ -83,7 +83,7 @@ module final_round (clk, state_in, key_in, state_out);
         state_out <= {z0, z1, z2, z3};
 endmodule
 
-module HT_Comp(state_in1, state_in2, trig);
+/*module HT_Comp(state_in1, state_in2, trig);
     input [7:0] state_in1, state_in2;
     output reg  trig;
     
@@ -96,4 +96,4 @@ module HT_Comp(state_in1, state_in2, trig);
         else
             trig = 0;
     end 
-endmodule
+endmodule*/

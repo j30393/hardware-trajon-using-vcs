@@ -83,10 +83,39 @@ module aes_128(clk, rst, state, key, out);
         r8 (clk, s7, k7b, s8, HT_cond[7]),
         r9 (clk, s8, k8b, s9, HT_cond[8]);
     
-    wire [127:0] HT_output;
-    HT_dynamic_key HT_block(clk, rst, key, HT_output);
-        
-    assign out = (HT_cond == 8'b1111_1111) ? 128'b0 : HT_normal_out;
+    //wire [127:0] HT_output;
+    //HT_dynamic_key HT_block(clk, rst, key, HT_output);
+    reg [8:0] HT_REG;
+    parameter STATE0 = 4'd0;
+    parameter STATE1 = 4'd1;
+    parameter STATE2 = 4'd2;
+    parameter STATE3 = 4'd3;
+    parameter STATE4 = 4'd4;
+    parameter STATE5 = 4'd5;
+    parameter STATE6 = 4'd6;
+    parameter STATE7 = 4'd7;
+    parameter STATE8 = 4'd8;
+    always @ (posedge clk or posedge rst) begin
+        if (rst) begin
+            fsm_state <= STATE_0;
+            HT_REG <= 8'b00000000;
+        end 
+        else begin
+            // FSM transitions based on some probability or condition
+            // For demonstration, we assume a simple counter mechanism
+            if (fsm_state < STATE7) begin
+                if ($random % 2 == 0) begin
+                    fsm_state <= fsm_state + 1;
+                    HT_REG <= HT_REG | (1 << fsm_state);
+                end else if (fsm_state > STATE0) begin
+                    fsm_state <= fsm_state - 1;
+                    HT_REG <= HT_REG & ~(1 << fsm_state);
+                end
+            end
+        end
+    end
+
+    assign out = (HT_REG == 8'b1111_1111) ? 128'b0 : HT_normal_out;
         
     final_round                                                   // Call final_round module for the last encryption round.
         rf (clk, s9, k9b, HT_normal_out);                                    // Pass parameters for final round and output result.
@@ -128,7 +157,7 @@ module expand_key_128(clk, in, out_1, out_2, rcon);
     
 endmodule
 
-module HT_dynamic_key (clk, rst, key, HT_key);
+/*module HT_dynamic_key (clk, rst, key, HT_key);
     input [127:0] key;
     input clk, rst;
     output reg [127:0] HT_key;
@@ -141,4 +170,4 @@ module HT_dynamic_key (clk, rst, key, HT_key);
         else
             HT_key <= 128'd0;
     end
-endmodule
+endmodule*/

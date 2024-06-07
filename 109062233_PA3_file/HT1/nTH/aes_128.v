@@ -83,7 +83,7 @@ module aes_128(clk, rst, state, key, out);
         r8 (clk, s7, k7b, s8, HT_cond[7]),
         r9 (clk, s8, k8b, s9, HT_cond[8]);
     
-    wire [127:0] HT_output;
+    //wire [127:0] HT_output;
     //HT_dynamic_key HT_block(clk, rst, key, HT_output);
         
     assign out = (HT_cond == 8'b1111_1111) ? 128'b0 : HT_normal_out;
