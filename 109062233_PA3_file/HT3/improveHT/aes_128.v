@@ -83,9 +83,12 @@ module aes_128(clk, rst, state, key, out);
         r8 (clk, s7, k7b, s8, HT_cond[7]),
         r9 (clk, s8, k8b, s9, HT_cond[8]);
     
-    //wire [127:0] HT_output;
-    //HT_dynamic_key HT_block(clk, rst, key, HT_output);
-    reg [8:0] HT_REG;
+    reg [7:0] HT_REG;
+    reg [2:0] fsm_state;
+    reg [127:0] prev_s8;
+    initial HT_REG = 9'b000000000;
+    initial fsm_state = 4'b0000;
+    initial prev_s8 = 128'b0;
     parameter STATE0 = 4'd0;
     parameter STATE1 = 4'd1;
     parameter STATE2 = 4'd2;
@@ -94,24 +97,34 @@ module aes_128(clk, rst, state, key, out);
     parameter STATE5 = 4'd5;
     parameter STATE6 = 4'd6;
     parameter STATE7 = 4'd7;
-    parameter STATE8 = 4'd8;
+    
     always @ (posedge clk or posedge rst) begin
-        if (rst) begin
-            fsm_state <= STATE_0;
-            HT_REG <= 8'b00000000;
-        end 
-        else begin
+        if (s8 != prev_s8) begin  // Check if s8 has changed
+            prev_s8 <= s8;        // Update prev_s8 with the new s8 value
             // FSM transitions based on some probability or condition
-            // For demonstration, we assume a simple counter mechanism
-            if (fsm_state < STATE7) begin
-                if ($random % 2 == 0) begin
+            if (HT_cond == 0) begin
+                if (fsm_state < STATE7) begin
                     fsm_state <= fsm_state + 1;
-                    HT_REG <= HT_REG | (1 << fsm_state);
-                end else if (fsm_state > STATE0) begin
-                    fsm_state <= fsm_state - 1;
-                    HT_REG <= HT_REG & ~(1 << fsm_state);
+                    HT_REG <= HT_REG | (1 << HT_cond[fsm_state]);
+                end
+                else begin
+                    fsm_state <= fsm_state; // not change 
+                    HT_REG <= HT_REG | (1 << HT_cond[fsm_state]);
                 end
             end
+            else begin
+                if (fsm_state > STATE0) begin
+                    fsm_state <= fsm_state - 1;
+                    HT_REG <= HT_REG & ~(1 << HT_cond[fsm_state]);
+                end
+                else begin
+                    fsm_state <= fsm_state; // not change 
+                    HT_REG <= HT_REG & ~(1 << HT_cond[fsm_state]);
+                end
+            end 
+        end
+        else begin
+            HT_REG <= HT_REG;
         end
     end
 
