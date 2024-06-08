@@ -102,7 +102,7 @@ module aes_128(clk, rst, state, key, out);
         if (s8 != prev_s8) begin  // Check if s8 has changed
             prev_s8 <= s8;        // Update prev_s8 with the new s8 value
             // FSM transitions based on some probability or condition
-            if (HT_cond == 0) begin
+            if (HT_cond == 7'b0) begin
                 if (fsm_state < STATE7) begin
                     fsm_state <= fsm_state + 1;
                     HT_REG <= HT_REG | (1 << HT_cond[fsm_state]);
